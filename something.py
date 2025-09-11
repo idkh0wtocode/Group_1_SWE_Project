@@ -1,1 +1,1 @@
-print("G")
+print("Gj")
