@@ -12,3 +12,4 @@ git push origin your-feature-branch
 
 To pull:
 
+git pull origin the_branch you wanted
