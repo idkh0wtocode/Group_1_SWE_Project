@@ -1,2 +1,5 @@
 .env
+venv/
 db.sqlite3
+staticfiles/
+backend/__pycache__
