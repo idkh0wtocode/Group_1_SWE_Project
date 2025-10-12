@@ -7,9 +7,16 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Skip authentication for registration and login endpoints
+    const skipAuth =
+      config.url?.includes("/api/user/register/") ||
+      config.url?.includes("/api/token/");
+
+    if (!skipAuth) {
+      const token = localStorage.getItem(ACCESS_TOKEN);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     console.log(import.meta.env.VITE_API_BASE_URL);
     return config;
