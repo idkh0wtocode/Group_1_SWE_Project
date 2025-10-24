@@ -16,29 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.http import JsonResponse
-from api.views import CreateUserView # view we just wrot in api/views.py
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
-def api_root(request):
-    return JsonResponse({
-        'message': 'Notes API is running!',
-        'endpoints': {
-            'register': '/api/user/register/',
-            'login': '/api/token/',
-            'refresh': '/api/token/refresh/',
-            'notes': '/api/notes/',
-            'admin': '/admin/',
-            'api_auth': '/api-auth/'
-        }
-    })
 
 urlpatterns = [
-    path('', api_root, name='api-root'), # root endpoint
-    path('admin/', admin.site.urls), # admin path
-    path("api/user/register/", CreateUserView.as_view(), name="user-register"), # endpoint to register new user]
-    path("api/token/", TokenObtainPairView.as_view(), name="get_token"), # endpoint to get token
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="refresh"), # endpoint to refresh token
-    path("api-auth/", include("rest_framework.urls")), # added for browsable api
-    path("api/", include("api.urls")), # include api app urls
+    path('admin/', admin.site.urls),
+    path("api/", include("api.urls")),
 ]

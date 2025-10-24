@@ -1,14 +1,19 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import Group
+from django.conf import settings
+from django.utils import timezone
 
-# Create your models here.
 
-class Note(models.Model):
-    title = models.CharField(max_length=100) # title of the note
-    content = models.TextField() # content of the note
-    created_at = models.DateTimeField(auto_now_add=True) # timestamp when note is created
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notes') # link note to user
-    # updated_at = models.DateTimeField(auto_now=True)
+import uuid
+    
+class User(AbstractUser): # ['id', 'username', 'email', 'dob', 'first_name', 'last_name',  'password', 'created_at']
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True) # unique identifier for the user
+    dob = models.DateField(null=True, blank=True) # date of birth of the user
+    created_at = models.DateTimeField(auto_now_add=True)
+    groups = models.ManyToManyField(Group, related_name="api_user_set", blank=True)
+    is_seller = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.title
+        return self.username
