@@ -88,10 +88,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'marketplace',
-        'USER': 'admin',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
+        'NAME': 'magic_mega_marketplace',
+        'USER': 'cen3031',
+        'PASSWORD': 'devpass',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }

@@ -30,6 +30,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from .models import Products, Category, ProductImage
 from .serializers import ProductsSerializer, ProductImageSerializer, CategorySerializer
 
+from users.models import Listing
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 # methods are list, create, retrieve, update, partial_update, destroy
 class ProductsViewSet(viewsets.ModelViewSet):
     serializer_class = ProductsSerializer
@@ -60,7 +64,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer # retursn all of the categories
     permission_classes = [AllowAny] # allows anyone to access all of the process
     queryset = Category.objects.all() # grabs all of the categories
-    
-    
-        
 
+
+class ListingsAPI(APIView):
+    def get(self, request):
+        listings = list(Listing.objects.all().values('title', 'price_cents'))
+        return Response(listings)
