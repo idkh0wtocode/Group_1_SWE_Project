@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework', # Christian Cardenas added this
     'users', # Christian Cardenas added this; used to be 'api'
     'products',
-    'corsheaders' # Christian Cardenas added this
+    'reports',
+    'corsheaders', # Christian Cardenas added this
 ]
 
 REST_FRAMEWORK = {

@@ -185,6 +185,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Login from "./pages/Login.jsx"
 import Register from "./pages/Register.jsx"
 import Home from "./pages/Home.jsx"
+import Reports from "./components/Reports.jsx"
 import NotFound from "./pages/NotFound.jsx"
 import ProtectedRoute from "./components/ProtectedRoutes.jsx"
 
@@ -207,6 +208,14 @@ function App() {
 					element={
 						<ProtectedRoute>
 							<Home />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/reports"
+					element={
+						<ProtectedRoute>
+							<Reports />
 						</ProtectedRoute>
 					}
 				/>

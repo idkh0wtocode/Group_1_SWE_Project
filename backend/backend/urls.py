@@ -41,8 +41,9 @@ from rest_framework_simplejwt.views import (
 )
 
 # --- 1. Import your ViewSet classes from your apps ---
-from users.views import UserViewSet  # NOTE: Adjust the import if your view is named differently
+from users.views import UserViewSet
 from products.views import ProductsViewSet, ProductImageViewSet, CategoryViewSet
+from reports.views import ReportsViewSet
 
 # --- 2. Create a single, central router instance ---
 router = DefaultRouter()
@@ -56,6 +57,9 @@ router.register(r'products', ProductsViewSet, basename='products')
 router.register(r'product-images', ProductImageViewSet, basename='product_image') # Changed to use a hyphen for consistency
 router.register(r'categories', CategoryViewSet, basename='category') # Made plural for consistency
 
+# Register endpoints from the 'report' app
+router.register(r'reports', ReportsViewSet, basename='reports')
+
 # --- 4. Define your main URL patterns ---
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -67,9 +71,4 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api-auth/', include('rest_framework.urls')),
 
-    # You can keep other includes if you have them, but remove any
-    # that point to your old, separate API app URLs.
-    # For example, DELETE these lines if they exist:
-    # path('api/users/', include('users.urls')),
-    # path('api/', include('products.urls')),
 ]
