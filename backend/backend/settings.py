@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'users', # Christian Cardenas added this; used to be 'api'
     'products',
     'reports',
+    'cart',
     'corsheaders', # Christian Cardenas added this
 ]
 

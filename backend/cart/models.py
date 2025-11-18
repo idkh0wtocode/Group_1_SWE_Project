@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 import uuid
+from products.models import Products 
 
 class Cart(models.Model):
     cart_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -11,10 +12,9 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    item_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey('products.Product', on_delete=models.CASCADE, related_name='cart_items')
-    quantity = models.IntegerField(default=1)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE, related_name='cart_items')
+    quantity = models.PositiveIntegerField(default=1)
 
     class Meta:
         unique_together = ('cart', 'product')

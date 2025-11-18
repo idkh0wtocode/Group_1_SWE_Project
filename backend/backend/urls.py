@@ -40,27 +40,21 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-# --- 1. Import your ViewSet classes from your apps ---
 from users.views import UserViewSet
-from products.views import ProductsViewSet, ProductImageViewSet, CategoryViewSet
+from products.views import ProductsViewSet, ProductImageViewSet, CategoryViewSet, ProductListAll, ProductUserList
 from reports.views import ReportsViewSet
 
-# --- 2. Create a single, central router instance ---
+
 router = DefaultRouter()
 
-# --- 3. Register all your ViewSets with this single router ---
-# Register endpoints from the 'users' app
+
 router.register(r'users', UserViewSet, basename='user') 
-
-# Register endpoints from the 'products' app
 router.register(r'products', ProductsViewSet, basename='products')
-router.register(r'product-images', ProductImageViewSet, basename='product_image') # Changed to use a hyphen for consistency
-router.register(r'categories', CategoryViewSet, basename='category') # Made plural for consistency
-
-# Register endpoints from the 'report' app
+router.register(r'product-images', ProductImageViewSet, basename='product_image')
+router.register(r'categories', CategoryViewSet, basename='category') 
 router.register(r'reports', ReportsViewSet, basename='reports')
 
-# --- 4. Define your main URL patterns ---
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     
@@ -70,5 +64,6 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api-auth/', include('rest_framework.urls')),
-
+    path('api/products/custom/', include("products.urls")),
+    path('api/users/custom/', include("users.urls")),
 ]

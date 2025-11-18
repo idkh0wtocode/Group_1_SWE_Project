@@ -30,9 +30,13 @@ from django.template import loader
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
+from .permissions import IsOwnerOrReadOnly
 from .models import User
 from .serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer
+
 
 # methods are list, create, retrieve, update, partial_update, destroy
 class UserViewSet(viewsets.ModelViewSet):
@@ -40,12 +44,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
     # this gets the permmissions based on the request beeing called
     def get_permissions(self):
-        # if self.action == 'create':
-        #     return [AllowAny()]
-        # elif self.action == 'delete':
-        #     return [IsAdminUser()]
-        # return [IsAuthenticated()]
-        return [AllowAny()]
+        if self.action == 'create':
+            permission_classes =  [IsOwnerOrReadOnly, IsAuthenticated, IsAdminUser]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [IsAuthenticated, IsOwnerOrReadOnly | IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
     
     # this changes the query set based on the user
     def get_queryset(self):
@@ -62,6 +67,11 @@ class UserViewSet(viewsets.ModelViewSet):
             return UserUpdateSerializer
         return UserSerializer
 
-    
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
     
         

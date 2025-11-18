@@ -64,7 +64,7 @@ function Reports() {
 				{reports.map((report) => (
 					<div key={report.report_id}>
 						<h4>{report.id}</h4>
-						<h4>{report.name}</h4>
+						<h4>{report.title}</h4>
 						<p>{report.description}</p>
 						<button onClick={() => deleteReport(report.report_id)}>
 							Delete
@@ -96,9 +96,6 @@ function Reports() {
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
 				></textarea>
-				<br />
-
-				<br />
 
 				<br />
 				<input type="submit" value="Submit"></input>
