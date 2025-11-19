@@ -67,6 +67,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api-auth/', include('rest_framework.urls')),
+    path('', include('messaging.urls')),
 
     # You can keep other includes if you have them, but remove any
     # that point to your old, separate API app URLs.

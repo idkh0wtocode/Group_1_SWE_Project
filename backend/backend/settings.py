@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-4__o7jjkr44##wn=$#-fgzb!lf%t12nvt)g_@)8t4uqjl*9ll)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework', # Christian Cardenas added this
     'users', # Christian Cardenas added this; used to be 'api'
     'products',
-    'corsheaders' # Christian Cardenas added this
+    'corsheaders', # Christian Cardenas added this
+    'messaging' #Jason added this
 ]
 
 REST_FRAMEWORK = {
