@@ -1,7 +1,13 @@
-import Form from "../components/Form"
+import LoginRegisterForm from "../components/LoginRegisterForm"
 
 function Register() {
-	return <Form key="register" route="/api/users/" method="register" />
+	return (
+		<LoginRegisterForm
+			key="register"
+			route="/api/users/"
+			method="register"
+		/>
+	)
 }
 
 export default Register

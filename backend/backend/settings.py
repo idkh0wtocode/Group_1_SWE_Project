@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'products',
     'corsheaders', # Christian Cardenas added this
     'messaging' #Jason added this
+    'reports',
+    'cart'
 ]
 
 REST_FRAMEWORK = {

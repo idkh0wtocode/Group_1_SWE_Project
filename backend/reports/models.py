@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 import uuid
 
-class Report(models.Model):
+class Reports(models.Model):
     report_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     reporter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name='reports', null=True)
     title = models.CharField(max_length=100)

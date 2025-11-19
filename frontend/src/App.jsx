@@ -185,8 +185,16 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Login from "./pages/Login.jsx"
 import Register from "./pages/Register.jsx"
 import Home from "./pages/Home.jsx"
+import Reports from "./components/Reports.jsx"
 import NotFound from "./pages/NotFound.jsx"
 import ProtectedRoute from "./components/ProtectedRoutes.jsx"
+import ProductList from "./components/ProductList.jsx"
+import TestComponent from "./components/TestComponent.jsx"
+import TestPage from "./pages/TestPage.jsx"
+import Account from "./pages/Account.jsx"
+import "./App.css"
+
+import Navbar from "./components/Navbar.jsx"
 
 function Logout() {
 	localStorage.clear()
@@ -201,15 +209,36 @@ function RegisterAndLogout() {
 function App() {
 	return (
 		<BrowserRouter>
+			<Navbar />
 			<Routes>
+				<Route path="/" element={<Home />} />
 				<Route
-					path="/"
+					path="/reports"
 					element={
 						<ProtectedRoute>
-							<Home />
+							<Reports />
 						</ProtectedRoute>
 					}
 				/>
+				<Route
+					path="/products"
+					element={
+						<ProtectedRoute>
+							<ProductList />
+						</ProtectedRoute>
+					}
+				/>
+				<Route path="/test" element={<TestPage />} />
+				<Route
+					path="/account"
+					element={
+						<ProtectedRoute>
+							<Account />
+						</ProtectedRoute>
+					}
+				/>
+
+				<Route path="/home" element={<Home />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/logout" element={<Logout />} />
 				<Route path="/register" element={<RegisterAndLogout />} />

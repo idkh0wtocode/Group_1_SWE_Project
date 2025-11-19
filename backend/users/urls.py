@@ -1,17 +1,17 @@
-# from django.urls import path, include
-# from rest_framework.routers import DefaultRouter
-# # routers allows you to quickly declare all of the common routes for a given resourcefull controller. 
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+# routers allows you to quickly declare all of the common routes for a given resourcefull controller. 
 
 
-# from .views import *
+from .views import *
+from products.views import ProductUserList
 
-# router = DefaultRouter()
-# # args are URL prefix, viewset class, basename(base to use for URL names), 
-# router.register(r'users', UserViewSet, basename='user') 
+# args are URL prefix, viewset class, basename(base to use for URL names), 
 
 
-# urlpatterns = [
-#     path('', include(router.urls)), # .urls is a standard list of url patterns
-# ]
+urlpatterns = [
+    path('current/', CurrentUserView.as_view(), name="current-user"), 
+    path('<int:pk>/products/', ProductUserList.as_view(), name="user-products"), 
+]
 
-# # urlpatterns += router.urls
+# urlpatterns += router.urls

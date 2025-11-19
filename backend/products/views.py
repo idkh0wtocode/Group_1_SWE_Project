@@ -21,14 +21,17 @@
     - fix query sets to only get what is correct(ex. for products only return the users products, for categories, only return products in that category(?), etc.)
 """
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 # from django import request
 from django.template import loader
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets # GenericAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 
 from .models import Products, Category, ProductImage
 from .serializers import ProductsSerializer, ProductImageSerializer, CategorySerializer
+from users.permissions import IsOwnerOrReadOnly
+
+
 
 from users.models import Listing
 from rest_framework.views import APIView
@@ -37,22 +40,46 @@ from rest_framework.response import Response
 # methods are list, create, retrieve, update, partial_update, destroy
 class ProductsViewSet(viewsets.ModelViewSet):
     serializer_class = ProductsSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsOwnerOrReadOnly] #[IsAuthenticated]
 
     # this gets the permmissions based on the request beeing called
-    # def get_permissions(self):
-    #     return [IsAuthenticated()]
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [AllowAny]  # Anyone can view/explore
+        else:
+            permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  # Only owner can modify
+        return [permission() for permission in permission_classes]
     
     # this changes the query set based on the user
     def get_queryset(self):
+        queryset = Products.objects.all()
         user = self.request.user
-        # if user:
-        #     return Products.objects.all()
-        return Products.objects.filter(seller=user)
+        explore = self.request.query_params.get("explore", None)
+        if explore == "true":
+            return queryset
+        else:
+            return Products.objects.filter(seller=user)
+
+        # return Products.objects.filter(seller=user)
     
     def perform_create(self, serializer):
         # Set the seller to the currently authenticated user.
         serializer.save(seller=self.request.user)
+
+
+class ProductListAll(generics.ListCreateAPIView):
+    queryset = Products.objects.all()
+    serializer_class = ProductsSerializer
+    permission_classes = [AllowAny]
+
+
+class ProductUserList(generics.ListCreateAPIView):
+    serializer_class = ProductsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Products.objects.filter(seller=user)
 
 class ProductImageViewSet(viewsets.ModelViewSet):
     serializer_class = ProductImageSerializer
