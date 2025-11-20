@@ -8,6 +8,10 @@ var server = app.listen(5000, function(){
     console.log('Listening on port 5000');
 });
 
+const parameters = new URLSearchParams(window.location.search);
+var receiverParam = parameters.get('receiver');
+var senderParam = parameters.get('sender');
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 
@@ -32,8 +36,8 @@ io.on('connection', function(socket){
         io.sockets.emit('chat', data);
 
         const query = await axios.post('http://127.0.0.1:8000/messages/send/',{
-            senderID: data.senderID,
-            receiverID: data.receiverID,
+            senderID: senderParam,
+            receiverID: receiverParam,
             content: data.message
         })
 

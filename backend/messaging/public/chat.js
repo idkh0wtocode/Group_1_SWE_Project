@@ -13,14 +13,17 @@ var message = document.getElementById('message'),
     receiver = document.getElementById('receiver'),
     peoplebtn = document.getElementById('sendPeople');
 
+const parameters = new URLSearchParams(window.location.search);
+var receiverParam = parameters.get('receiver');
+var senderParam = parameters.get('sender');
 
 btn.addEventListener('click', function(){
 
 
     socket.emit('chatSend',{
         message:message.value,
-        senderID:handle.value,
-        receiverID: 'Jason'
+        senderID:senderParam,
+        receiverID: receiverParam
     })
 
 });
@@ -28,7 +31,7 @@ btn.addEventListener('click', function(){
 peoplebtn.addEventListener('click', async function(){
     console.log(sender.value);
     console.log(receiver.value);
-    const previousMessages = await fetch(`http://127.0.0.1:8000/messages/${sender.value}/${receiver.value}`);
+    const previousMessages = await fetch(`http://127.0.0.1:8000/messages/${senderParam}/${receiverParam}`);
     const data = await previousMessages.json();
     console.log(data);
 

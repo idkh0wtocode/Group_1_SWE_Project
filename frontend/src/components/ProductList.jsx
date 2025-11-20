@@ -239,6 +239,15 @@ function ProductList({ products: products_i = [] }) {
 								<p>Quantity: {product.quantity}</p>
 								<p>Seller: {product.seller?.username}</p>
 								<Button variant="primary">Go somewhere</Button>
+								<Button variant = "primary" onClick = {async () => {
+									
+									const getUserId = await api.get("/api/users/custom/current/");
+									const userId = getUserId.data.username;
+									const sellerId = product.seller.username;
+									window.location.href = `http://localhost:5000/?sender=${encodeURIComponent(userId)}&receiver=${encodeURIComponent(sellerId)}`;
+									}
+								}
+									>Message</Button>
 							</Card.Body>
 						</Card>
 					</Col>
