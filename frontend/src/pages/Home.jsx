@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
 import api from "../api"
+import SearchBar from "../components/SearchBar"
+
 
 function Home() {
 	const [products, setProducts] = useState([])
@@ -76,6 +78,7 @@ function Home() {
 
 	return (
 		<div>
+			<SearchBar />
 			<div>
 				<h2>Your Products</h2>
 				{products.map((product) => (

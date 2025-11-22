@@ -33,6 +33,7 @@ from .serializers import ProductsSerializer, ProductImageSerializer, CategorySer
 from users.models import Listing
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.db.models import Q
 
 # methods are list, create, retrieve, update, partial_update, destroy
 class ProductsViewSet(viewsets.ModelViewSet):
@@ -70,3 +71,20 @@ class ListingsAPI(APIView):
     def get(self, request):
         listings = list(Listing.objects.all().values('title', 'price_cents'))
         return Response(listings)
+    
+
+
+class SearchAPI(APIView):
+    def get(self, request):
+        query = request.GET.get('q', '')
+
+        if query == '':
+            return Response({"results": []})
+
+        results = Products.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+        )
+
+        serializer = ProductsSerializer(results, many=True)
+        return Response({"results": serializer.data})

@@ -43,6 +43,7 @@ from rest_framework_simplejwt.views import (
 # --- 1. Import your ViewSet classes from your apps ---
 from users.views import UserViewSet  # NOTE: Adjust the import if your view is named differently
 from products.views import ProductsViewSet, ProductImageViewSet, CategoryViewSet, ListingsAPI  # <-- added ListingsAPI
+from products.views import SearchAPI
 
 # --- 2. Create a single, central router instance ---
 router = DefaultRouter()
@@ -63,7 +64,8 @@ urlpatterns = [
     # Include all the registered API endpoints under the 'api/' prefix
     # This single line creates your unified API root
     path('api/', include(router.urls)),
-    path('api/listings/', ListingsAPI.as_view()),  # <-- added listings route
+    path('api/listings/', ListingsAPI.as_view()),
+    path('api/search/', SearchAPI.as_view()),  
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api-auth/', include('rest_framework.urls')),

@@ -20,6 +20,11 @@ api.interceptors.request.use(
 )
 
 export default api
+export async function searchItems(query) {
+    const response = await fetch(`${API_URL}/search/?q=${query}`);
+    return response.json();
+}
+
 // later you’ll add token logic here
 // export const getUsers = () => api.get("users/")
 // export const createUser = (data) => api.post("users/", data)
