@@ -27,15 +27,29 @@
 from django.shortcuts import render
 # from django import request
 from django.template import loader
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsOwnerOrAdmin
 from .models import User
 from .serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer
+
+
+# Public registration view - allows anyone to register
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = UserCreateSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 # methods are list, create, retrieve, update, partial_update, destroy
@@ -45,9 +59,9 @@ class UserViewSet(viewsets.ModelViewSet):
     # this gets the permmissions based on the request beeing called
     def get_permissions(self):
         if self.action == 'create':
-            permission_classes =  [IsOwnerOrReadOnly, IsAuthenticated, IsAdminUser]
+            permission_classes = [IsAuthenticated, IsAdminUser]
         elif self.action in ['update', 'partial_update', 'destroy']:
-            permission_classes = [IsAuthenticated, IsOwnerOrReadOnly | IsAdminUser]
+            permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
         else:
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -55,7 +69,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # this changes the query set based on the user
     def get_queryset(self):
         user = self.request.user
-        if user.is_superuser:
+        if user.is_staff or user.is_superuser:
             return User.objects.all()
         return User.objects.filter(id=user.id)
 

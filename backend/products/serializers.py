@@ -11,9 +11,11 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductsSerializer(serializers.ModelSerializer):
     seller = UserSerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
+    status = serializers.CharField(required=False, default="In Stock")
+    
     class Meta:
         model = Products
-        fields = ['id', 'product_uuid', 'name', 'description', 'price', 'quantity', 'date_posted', 'seller', 'category', 'images']
+        fields = ['id', 'product_uuid', 'name', 'description', 'price', 'quantity', 'date_posted', 'seller', 'category', 'images', 'status']
 
 class CategorySerializer(serializers.ModelSerializer):
     products = ProductsSerializer(source='products_category', many=True, read_only=True)

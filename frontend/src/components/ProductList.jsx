@@ -56,11 +56,16 @@
 import { useState, useEffect } from "react"
 import api from "../api"
 import ProductCard from "./ProductCard"
+import AddToCartButton from "./AddToCartButton"
 // import Button from "react-bootstrap/Button"
 // import Card from "react-bootstrap/Card"
 import { Card, Button, Row, Col } from "react-bootstrap"
 
-function ProductList({ products: products_i = [] }) {
+function ProductList({
+	products: products_i = [],
+	showActions = false,
+	onProductDeleted,
+}) {
 	const [products, setProducts] = useState(products_i)
 	const [categories, setCategories] = useState([])
 
@@ -95,16 +100,29 @@ function ProductList({ products: products_i = [] }) {
 	}
 
 	const deleteProduct = (id) => {
-		api.delete(`/api/products/${id}/`)
-			.then((res) => {
-				if (res.status === 204) {
-					alert("Product Deleted!")
-					getProducts()
-				} else {
-					alert("Failed to delete product.")
-				}
-			})
-			.catch((error) => alert(error))
+		if (window.confirm("Are you sure you want to delete this product?")) {
+			api.delete(`/api/products/${id}/`)
+				.then((res) => {
+					if (res.status === 204) {
+						alert("Product Deleted!")
+						// Remove product from local state
+						setProducts(products.filter((p) => p.id !== id))
+						// Call callback if provided
+						if (onProductDeleted) {
+							onProductDeleted()
+						}
+					} else {
+						alert("Failed to delete product.")
+					}
+				})
+				.catch((error) => {
+					console.error("Delete error:", error)
+					alert(
+						error.response?.data?.detail ||
+							"Failed to delete product."
+					)
+				})
+		}
 	}
 
 	const createProduct = (e) => {
@@ -235,10 +253,36 @@ function ProductList({ products: products_i = [] }) {
 							<Card.Body>
 								<Card.Title>{product.name}</Card.Title>
 								<Card.Text>{product.description}</Card.Text>
-								<p>Price: ${product.price}</p>
-								<p>Quantity: {product.quantity}</p>
-								<p>Seller: {product.seller?.username}</p>
-								<Button variant="primary">Go somewhere</Button>
+								<p className="mb-1">
+									<strong>Price:</strong> ${product.price}
+								</p>
+								<p className="mb-1">
+									<strong>Quantity:</strong>{" "}
+									{product.quantity}
+								</p>
+								<p className="mb-3">
+									<strong>Seller:</strong>{" "}
+									{product.seller?.username}
+								</p>
+
+								{!showActions ? (
+									<AddToCartButton
+										productId={product.id}
+										productName={product.name}
+									/>
+								) : (
+									<div className="mt-3">
+										<Button
+											variant="danger"
+											size="sm"
+											onClick={() =>
+												deleteProduct(product.id)
+											}
+										>
+											Delete
+										</Button>
+									</div>
+								)}
 							</Card.Body>
 						</Card>
 					</Col>

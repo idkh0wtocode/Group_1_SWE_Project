@@ -43,13 +43,19 @@ class ReportsViewSet(viewsets.ModelViewSet):
     # this changes the query set based on the user
     def get_queryset(self):
         user = self.request.user
-        # if user:
-        #     return Products.objects.all()
+        # Admin users can see all reports
+        if user.is_staff or user.is_superuser:
+            return Reports.objects.all()
+        # Regular users only see their own reports
         return Reports.objects.filter(reporter=user)
     
     def perform_create(self, serializer):
-        # Set the seller to the currently authenticated user.
+        # Set the reporter to the currently authenticated user
         serializer.save(reporter=self.request.user)
+    
+    def perform_update(self, serializer):
+        # Preserve the original reporter when updating
+        serializer.save()
 
     
     

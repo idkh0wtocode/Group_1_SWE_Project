@@ -12,7 +12,11 @@ const Account = () => {
 	// get id from current user
 
 	useEffect(() => {
-		const fetchSellerData = async () => {
+		fetchSellerData()
+	}, [])
+
+	const fetchSellerData = async () => {
+		try {
 			// fetch current seller
 			const sellerRes = await api.get("/api/users/custom/current/")
 			setSeller(sellerRes.data)
@@ -23,16 +27,21 @@ const Account = () => {
 			)
 
 			setProducts(productsRes.data)
-			console.log("Fetched seller data:", productsRes.data)
+			console.log("Fetched products data:", productsRes.data)
+		} catch (error) {
+			console.error("Error fetching data:", error)
 		}
-		fetchSellerData()
-	}, [])
+	}
 
 	return (
 		<div className="p-8">
-			<h1 className="text-3xl font-bold mb-6">Marketplace</h1>
+			<h1 className="text-3xl font-bold mb-6">My Products</h1>
 			<CreateProduct />
-			<ProductList products={products} />
+			<ProductList
+				products={products}
+				showActions={true}
+				onProductDeleted={fetchSellerData}
+			/>
 		</div>
 	)
 }

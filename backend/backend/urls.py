@@ -40,9 +40,10 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from users.views import UserViewSet
+from users.views import UserViewSet, RegisterView
 from products.views import ProductsViewSet, ProductImageViewSet, CategoryViewSet, ProductListAll, ProductUserList
 from reports.views import ReportsViewSet
+from cart.views import CartViewSet, CartItemViewSet
 
 
 router = DefaultRouter()
@@ -53,10 +54,15 @@ router.register(r'products', ProductsViewSet, basename='products')
 router.register(r'product-images', ProductImageViewSet, basename='product_image')
 router.register(r'categories', CategoryViewSet, basename='category') 
 router.register(r'reports', ReportsViewSet, basename='reports')
+router.register(r'cart', CartViewSet, basename='cart')
+router.register(r'cart-items', CartItemViewSet, basename='cart-items')
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # Public registration endpoint
+    path('api/register/', RegisterView.as_view(), name='register'),
     
     # Include all the registered API endpoints under the 'api/' prefix
     # This single line creates your unified API root

@@ -142,9 +142,13 @@ function LoginRegisterForm({ route, method }) {
 			)}
 			{/* --- END OF CONDITIONAL RENDERING --- */}
 
-			{loading && <LoadingIndicator />}
-			<button className="form-button" type="submit">
-				{name}
+			{loading && (
+				<div className="text-center py-2">
+					<span>Loading...</span>
+				</div>
+			)}
+			<button className="form-button" type="submit" disabled={loading}>
+				{loading ? "Loading..." : name}
 			</button>
 		</form>
 	)

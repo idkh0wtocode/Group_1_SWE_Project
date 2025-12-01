@@ -33,7 +33,7 @@ class Products(models.Model):
         "In Stock": "In Stock",
         "Out of Stock": "Out of Stock",
     }
-    status = models.CharField(choices=PRODUCT_AVAILABILITY, default="In Stock")
+    status = models.CharField(choices=PRODUCT_AVAILABILITY, default="In Stock", max_length=20)
 
 
     def __str__(self):

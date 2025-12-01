@@ -186,12 +186,14 @@ import Login from "./pages/Login.jsx"
 import Register from "./pages/Register.jsx"
 import Home from "./pages/Home.jsx"
 import Reports from "./components/Reports.jsx"
+import Cart from "./components/Cart.jsx"
 import NotFound from "./pages/NotFound.jsx"
 import ProtectedRoute from "./components/ProtectedRoutes.jsx"
 import ProductList from "./components/ProductList.jsx"
 import TestComponent from "./components/TestComponent.jsx"
 import TestPage from "./pages/TestPage.jsx"
 import Account from "./pages/Account.jsx"
+import AdminView from "./pages/AdminView.jsx"
 import "./App.css"
 
 import Navbar from "./components/Navbar.jsx"
@@ -220,15 +222,23 @@ function App() {
 						</ProtectedRoute>
 					}
 				/>
-				<Route
+				{/* <Route
 					path="/products"
 					element={
 						<ProtectedRoute>
 							<ProductList />
 						</ProtectedRoute>
 					}
-				/>
+				/> */}
 				<Route path="/test" element={<TestPage />} />
+				<Route
+					path="/cart"
+					element={
+						<ProtectedRoute>
+							<Cart />
+						</ProtectedRoute>
+					}
+				/>
 				<Route
 					path="/account"
 					element={
@@ -237,6 +247,7 @@ function App() {
 						</ProtectedRoute>
 					}
 				/>
+				<Route path="/admin/products" element={<AdminView />} />
 
 				<Route path="/home" element={<Home />} />
 				<Route path="/login" element={<Login />} />
