@@ -1,8 +1,8 @@
 body{
     font-family: 'Nunito';
-    justify-content: center;
-    align-items:center;
-    display:flex;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 h2{
@@ -82,4 +82,12 @@ button{
     padding: 12px 0;
     width: 200px;
     border-radius: 0 0 2px 2px;
+}
+
+.chat-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    padding: 20px;
 }

@@ -8,9 +8,6 @@ var server = app.listen(5000, function(){
     console.log('Listening on port 5000');
 });
 
-const parameters = new URLSearchParams(window.location.search);
-var receiverParam = parameters.get('receiver');
-var senderParam = parameters.get('sender');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
@@ -29,15 +26,15 @@ app.use(express.static('public'));
 
 var io = socket(server);
 
-io.on('connection', function(socket){
+io.on('connection', async function(socket){
     console.log('connected');
 
     socket.on('chatSend', async function(data){
         io.sockets.emit('chat', data);
 
         const query = await axios.post('http://127.0.0.1:8000/messages/send/',{
-            senderID: senderParam,
-            receiverID: receiverParam,
+            senderID: data.senderID,
+            receiverID: data.receiverID,
             content: data.message
         })
 
@@ -46,7 +43,7 @@ io.on('connection', function(socket){
     });
 
     socket.on('typing', function(data){
-        socket.broadcast.emit('typing', data);
+        socket.broadcast.emit('typing', data.senderID);
     });
 
     socket.on('chatRetrieve', function(data){

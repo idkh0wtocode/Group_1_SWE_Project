@@ -13,12 +13,12 @@ var message = document.getElementById('message'),
     receiver = document.getElementById('receiver'),
     peoplebtn = document.getElementById('sendPeople');
 
-const parameters = new URLSearchParams(window.location.search);
-var receiverParam = parameters.get('receiver');
-var senderParam = parameters.get('sender');
 
 btn.addEventListener('click', function(){
 
+    const parameters = new URLSearchParams(window.location.search);
+    var receiverParam = parameters.get('receiver');
+    var senderParam = parameters.get('sender');
 
     socket.emit('chatSend',{
         message:message.value,
@@ -28,9 +28,27 @@ btn.addEventListener('click', function(){
 
 });
 
+window.addEventListener('DOMContentLoaded', async function(){
+    const parameters = new URLSearchParams(window.location.search);
+    var receiverParam = parameters.get('receiver');
+    var senderParam = parameters.get('sender');
+    const previousMessages = await fetch(`http://127.0.0.1:8000/messages/${senderParam}/${receiverParam}`);
+    const data = await previousMessages.json();
+    console.log(data);
+
+    for (let i = 0; i<data.length; i++) {
+        socket.emit('chatRetrieve',{
+            senderID:data[i].senderID,
+            message:data[i].content
+        })
+    }
+})
+/*
 peoplebtn.addEventListener('click', async function(){
-    console.log(sender.value);
-    console.log(receiver.value);
+
+    const parameters = new URLSearchParams(window.location.search);
+    var receiverParam = parameters.get('receiver');
+    var senderParam = parameters.get('sender');
     const previousMessages = await fetch(`http://127.0.0.1:8000/messages/${senderParam}/${receiverParam}`);
     const data = await previousMessages.json();
     console.log(data);
@@ -42,9 +60,11 @@ peoplebtn.addEventListener('click', async function(){
         })
     }
 });
-
+*/
 message.addEventListener('keypress', function(){
-    socket.emit('typing', handle.value)
+    const parameters = new URLSearchParams(window.location.search);
+    var senderParam = parameters.get('sender');
+    socket.emit('typing', senderParam)
 });
 
 socket.on('chat', function(data){
