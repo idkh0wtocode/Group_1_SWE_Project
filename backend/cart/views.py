@@ -1,78 +1,98 @@
-"""
-    Questions to ask for each view:
-        - What data do i need to display and manupulate?
-        - What type of user ineractions? Crud?
-        - Responses to send? Json for react frontend?
-        - Who can see this resource?
-        - Who can create a new instance of this resource? 
-        - Who can modify or delete a specific, existing instance of this resource?
-        - Who else, other than the creator, needs access to this specific instance, and what level of access do they need?
-        - When a user requests a list of this resource, should they see all records, or only their own records?
-"""
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
-"""
-    Things to do:
-    - ensure there is authentication for each view: 
-        - CartViewSet/CartItemsViewSet-  only owner to view/write/delete/edit (IsAuthenticated)
-    - make permissions.py file that sets permissions for sellers, admins, buyers, owners, etc.
-    - fix query sets to only get what is correct(ex. for products only return the users products, for categories, only return products in that category(?), etc.)
-"""
-
-from django.shortcuts import render, get_object_or_404
-from django.template import loader
-from rest_framework import generics, viewsets # GenericAPIView, ListCreateAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
-
-from .models import Products, Category, ProductImage
-from .serializers import ProductsSerializer, ProductImageSerializer, CategorySerializer
-from users.permissions import IsOwnerOrReadOnly
+from .models import Cart, CartItem
+from .serializers import CartSerializer, CartItemSerializer
+from products.models import Products
 
 
-
-# methods are list, create, retrieve, update, partial_update, destroy
-class ProductsViewSet(viewsets.ModelViewSet):
-    serializer_class = ProductsSerializer
-    permission_classes = [IsOwnerOrReadOnly] #[IsAuthenticated]
-
-    # this gets the permmissions based on the request beeing called
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            permission_classes = [AllowAny]  # Anyone can view/explore
-        else:
-            permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  # Only owner can modify
-        return [permission() for permission in permission_classes]
-    
-    # this changes the query set based on the user
-    def get_queryset(self):
-        queryset = Products.objects.all()
-        user = self.request.user
-        explore = self.request.query_params.get("explore", None)
-        if explore == "true":
-            return queryset
-        else:
-            return Products.objects.filter(seller=user)
-
-        # return Products.objects.filter(seller=user)
-    
-    def perform_create(self, serializer):
-        # Set the seller to the currently authenticated user.
-        serializer.save(seller=self.request.user)
-
-
-class ProductListAll(generics.ListCreateAPIView):
-    queryset = Products.objects.all()
-    serializer_class = ProductsSerializer
-    permission_classes = [AllowAny]
-
-
-class CartUserList(generics.ListCreateAPIView):
-    serializer_class = ProductsSerializer
+class CartViewSet(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        return Products.objects.filter(seller=user)
+        # Users can only see their own cart
+        return Cart.objects.filter(user=self.request.user)
     
+    def get_or_create_cart(self):
+        """Get or create a cart for the current user"""
+        cart, created = Cart.objects.get_or_create(user=self.request.user)
+        return cart
+
+    @action(detail=False, methods=['get'])
+    def my_cart(self, request):
+        """Get the current user's cart with all items"""
+        cart = self.get_or_create_cart()
+        serializer = self.get_serializer(cart)
+        return Response(serializer.data)
+
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    serializer_class = CartItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Users can only see items in their own cart
+        return CartItem.objects.filter(cart__user=self.request.user)
+    
+    def create(self, request, *args, **kwargs):
+        """Add item to cart or update quantity if already exists"""
+        product_id = request.data.get('product_id')
+        quantity = int(request.data.get('quantity', 1))
+
+        if not product_id:
+            return Response(
+                {'error': 'product_id is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Get or create the user's cart
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+
+        # Get the product
+        try:
+            product = Products.objects.get(id=product_id)
+        except Products.DoesNotExist:
+            return Response(
+                {'error': 'Product not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Check if item already exists in cart
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            product=product,
+            defaults={'quantity': quantity}
+        )
+
+        if not created:
+            # Update quantity if item already exists
+            cart_item.quantity += quantity
+            cart_item.save()
+
+        serializer = self.get_serializer(cart_item)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def update(self, request, *args, **kwargs):
+        """Update quantity of item in cart"""
+        cart_item = self.get_object()
+        quantity = request.data.get('quantity')
+
+        if quantity is not None:
+            cart_item.quantity = int(quantity)
+            cart_item.save()
+
+        serializer = self.get_serializer(cart_item)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['delete'])
+    def clear(self, request):
+        """Clear all items from the user's cart"""
+        CartItem.objects.filter(cart__user=request.user).delete()
+        return Response({'message': 'Cart cleared'}, status=status.HTTP_204_NO_CONTENT)
     
         
 

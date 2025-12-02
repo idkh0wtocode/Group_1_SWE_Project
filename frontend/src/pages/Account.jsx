@@ -1,5 +1,6 @@
 import React from "react"
 import { useEffect, useState } from "react"
+import { Container, Row, Col, Card } from "react-bootstrap"
 import ProductList from "../components/ProductList"
 import CreateProduct from "../components/CreateProduct"
 import api from "../api"
@@ -12,7 +13,11 @@ const Account = () => {
 	// get id from current user
 
 	useEffect(() => {
-		const fetchSellerData = async () => {
+		fetchSellerData()
+	}, [])
+
+	const fetchSellerData = async () => {
+		try {
 			// fetch current seller
 			const sellerRes = await api.get("/api/users/custom/current/")
 			setSeller(sellerRes.data)
@@ -23,17 +28,48 @@ const Account = () => {
 			)
 
 			setProducts(productsRes.data)
-			console.log("Fetched seller data:", productsRes.data)
+			console.log("Fetched products data:", productsRes.data)
+		} catch (error) {
+			console.error("Error fetching data:", error)
 		}
-		fetchSellerData()
-	}, [])
+	}
 
 	return (
-		<div className="p-8">
-			<h1 className="text-3xl font-bold mb-6">Marketplace</h1>
-			<CreateProduct />
-			<ProductList products={products} />
-		</div>
+		<Container className="py-4">
+			<Row>
+				<Col md={8}>
+					<h1 className="mb-4">My Products</h1>
+					{products.length === 0 ? (
+						<Card className="mb-3">
+							<Card.Body>
+								<Card.Text className="text-muted">
+									You haven't created any products yet. Use
+									the form on the right to create your first
+									product.
+								</Card.Text>
+							</Card.Body>
+						</Card>
+					) : (
+						<ProductList
+							products={products}
+							showActions={true}
+							onProductDeleted={fetchSellerData}
+						/>
+					)}
+				</Col>
+
+				<Col md={4}>
+					<Card className="sticky-top" style={{ top: "20px" }}>
+						<Card.Body>
+							<Card.Title className="mb-3">
+								Create New Product
+							</Card.Title>
+							<CreateProduct onProductCreated={fetchSellerData} />
+						</Card.Body>
+					</Card>
+				</Col>
+			</Row>
+		</Container>
 	)
 }
 

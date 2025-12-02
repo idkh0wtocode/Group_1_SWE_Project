@@ -171,34 +171,74 @@
 import React from "react"
 import { useEffect, useState } from "react"
 import ProductList from "../components/ProductList"
+import SearchBar from "../components/SearchBar"
 import api from "../api"
 
 const Home = () => {
 	const [products, setProducts] = useState([])
+	const [filteredProducts, setFilteredProducts] = useState([])
+	const [searchTerm, setSearchTerm] = useState("")
 
 	useEffect(() => {
-		// Fetch products from Django backend
-		const fetchProducts = async () => {
-			const productsRes = await api.get("/api/products/custom/all/")
-			setProducts(productsRes.data)
-		}
-
-		// fetch("http://127.0.0.1:8000/api/products/custom/all/", {
-		// 	method: "GET",
-		// 	credentials: "omit",
-		// })
-		// 	.then((res) => res.json())
-		// 	.then((data) => {
-		// 		console.log("Fetched products:", data)
-		// 		setProducts(data)
-		// 	})
 		fetchProducts()
 	}, [])
+
+	const fetchProducts = async () => {
+		try {
+			const productsRes = await api.get("/api/products/custom/all/")
+			setProducts(productsRes.data)
+			setFilteredProducts(productsRes.data)
+		} catch (error) {
+			console.error("Error fetching products:", error)
+		}
+	}
+
+	const handleSearchChange = (value) => {
+		setSearchTerm(value)
+		filterProducts(value)
+	}
+
+	const filterProducts = (searchValue) => {
+		if (!searchValue.trim()) {
+			setFilteredProducts(products)
+			return
+		}
+
+		const lowercasedSearch = searchValue.toLowerCase()
+		const filtered = products.filter((product) => {
+			const nameMatch = product.name
+				?.toLowerCase()
+				.includes(lowercasedSearch)
+			const descriptionMatch = product.description
+				?.toLowerCase()
+				.includes(lowercasedSearch)
+			const sellerMatch = product.seller?.username
+				?.toLowerCase()
+				.includes(lowercasedSearch)
+
+			return nameMatch || descriptionMatch || sellerMatch
+		})
+
+		setFilteredProducts(filtered)
+	}
 
 	return (
 		<div className="p-8">
 			<h1 className="text-3xl font-bold mb-6">Marketplace</h1>
-			<ProductList products={products} />
+			<SearchBar
+				searchTerm={searchTerm}
+				onSearchChange={handleSearchChange}
+			/>
+			{filteredProducts.length === 0 && searchTerm ? (
+				<div className="text-center text-gray-500 py-8">
+					<p className="text-xl">
+						No products found for "{searchTerm}"
+					</p>
+					<p>Try searching with different keywords</p>
+				</div>
+			) : (
+				<ProductList products={filteredProducts} />
+			)}
 		</div>
 	)
 }

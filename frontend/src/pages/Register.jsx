@@ -4,7 +4,7 @@ function Register() {
 	return (
 		<LoginRegisterForm
 			key="register"
-			route="/api/users/"
+			route="/api/register/"
 			method="register"
 		/>
 	)

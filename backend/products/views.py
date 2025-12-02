@@ -52,19 +52,49 @@ class ProductsViewSet(viewsets.ModelViewSet):
     
     # this changes the query set based on the user
     def get_queryset(self):
+        # Admin users can see all products
+        if self.request.user.is_authenticated and (self.request.user.is_staff or self.request.user.is_superuser):
+            return Products.objects.all()
+        
+        # Regular users only see their own products unless exploring
         queryset = Products.objects.all()
         user = self.request.user
         explore = self.request.query_params.get("explore", None)
         if explore == "true":
             return queryset
         else:
-            return Products.objects.filter(seller=user)
-
-        # return Products.objects.filter(seller=user)
+            if user.is_authenticated:
+                return Products.objects.filter(seller=user)
+            return queryset
     
     def perform_create(self, serializer):
         # Set the seller to the currently authenticated user.
-        serializer.save(seller=self.request.user)
+        product = serializer.save(seller=self.request.user)
+        
+        # Handle image upload if provided
+        image_file = self.request.FILES.get('image')
+        if image_file:
+            ProductImage.objects.create(
+                product=product,
+                image=image_file,
+                is_main=True
+            )
+
+    def perform_update(self, serializer):
+        # Update the product
+        product = serializer.save()
+        
+        # Handle image upload if provided
+        image_file = self.request.FILES.get('image')
+        if image_file:
+            # Delete old main image if exists
+            ProductImage.objects.filter(product=product, is_main=True).delete()
+            # Create new main image
+            ProductImage.objects.create(
+                product=product,
+                image=image_file,
+                is_main=True
+            )
 
 
 class ProductListAll(generics.ListCreateAPIView):
