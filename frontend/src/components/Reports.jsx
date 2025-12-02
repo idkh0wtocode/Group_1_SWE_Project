@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { Card, Button, Form, Container, Row, Col } from "react-bootstrap"
 import api from "../api"
 
 function Reports() {
@@ -58,49 +59,93 @@ function Reports() {
 	}
 
 	return (
-		<div>
-			<div>
-				<h2>Your Reports</h2>
-				{reports.map((report) => (
-					<div key={report.report_id}>
-						<h4>{report.id}</h4>
-						<h4>{report.title}</h4>
-						<p>{report.description}</p>
-						<button onClick={() => deleteReport(report.report_id)}>
-							Delete
-						</button>
-						<hr />
-					</div>
-				))}
-			</div>
+		<Container className="py-4">
+			<Row>
+				<Col md={8}>
+					<h2 className="mb-4">Your Reports</h2>
+					{reports.length === 0 ? (
+						<Card className="mb-3">
+							<Card.Body>
+								<Card.Text className="text-muted">
+									No reports yet. Create your first report
+									below.
+								</Card.Text>
+							</Card.Body>
+						</Card>
+					) : (
+						reports.map((report) => (
+							<Card key={report.report_id} className="mb-3">
+								<Card.Body>
+									<Card.Title>{report.title}</Card.Title>
+									<Card.Text>{report.description}</Card.Text>
+									<Button
+										variant="danger"
+										size="sm"
+										onClick={() =>
+											deleteReport(report.report_id)
+										}
+									>
+										Delete
+									</Button>
+								</Card.Body>
+							</Card>
+						))
+					)}
+				</Col>
 
-			<h2>Create a New report</h2>
-			<form onSubmit={createReport}>
-				<label htmlFor="name">Title:</label>
-				<br />
-				<input
-					type="text"
-					id="title"
-					name="title"
-					required
-					onChange={(e) => setTitle(e.target.value)}
-					value={title}
-				/>
-				<br />
-				<label htmlFor="description">Description:</label>
-				<br />
-				<textarea
-					id="description"
-					name="description"
-					required
-					value={description}
-					onChange={(e) => setDescription(e.target.value)}
-				></textarea>
+				<Col md={4}>
+					<Card className="sticky-top" style={{ top: "20px" }}>
+						<Card.Body>
+							<Card.Title className="mb-3">
+								Create a New Report
+							</Card.Title>
+							<Form onSubmit={createReport}>
+								<Form.Group
+									className="mb-3"
+									controlId="reportTitle"
+								>
+									<Form.Label>Title</Form.Label>
+									<Form.Control
+										type="text"
+										placeholder="Enter report title"
+										required
+										value={title}
+										onChange={(e) =>
+											setTitle(e.target.value)
+										}
+									/>
+								</Form.Group>
 
-				<br />
-				<input type="submit" value="Submit"></input>
-			</form>
-		</div>
+								<Form.Group
+									className="mb-3"
+									controlId="reportDescription"
+								>
+									<Form.Label>Description</Form.Label>
+									<Form.Control
+										as="textarea"
+										rows={4}
+										placeholder="Describe the issue or concern"
+										required
+										value={description}
+										onChange={(e) =>
+											setDescription(e.target.value)
+										}
+									/>
+								</Form.Group>
+
+								<Button
+									variant="primary"
+									type="submit"
+									className="w-100"
+								>
+									Submit Report
+								</Button>
+							</Form>
+						</Card.Body>
+					</Card>
+				</Col>
+			</Row>
+		</Container>
 	)
 }
 

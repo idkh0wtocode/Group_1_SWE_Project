@@ -1,8 +1,9 @@
 import React from "react"
 import { useEffect, useState } from "react"
+import { Form, Button } from "react-bootstrap"
 import api from "../api"
 
-const CreateProduct = () => {
+const CreateProduct = ({ onProductCreated }) => {
 	const [products, setProducts] = useState()
 	const [categories, setCategories] = useState([])
 
@@ -69,75 +70,75 @@ const CreateProduct = () => {
 			.then((res) => {
 				if (res.status === 201) {
 					alert("Product Created!")
-					// Refresh products only after successful creation
-					getProducts()
+					// Clear form fields after submission
+					setName("")
+					setDescription("")
+					setPrice("")
+					setQuantity("")
+					setCategory("")
+					setSeller("")
+					// Call the callback to refresh products
+					if (onProductCreated) {
+						onProductCreated()
+					}
 				} else {
 					alert("Failed to create product.")
 				}
-				// Clear form fields after submission
-				setName("")
-				setDescription("")
-				setPrice("")
-				setQuantity("")
-				setCategory("")
-				setSeller("")
 			})
 			.catch((err) => alert(err.response.data)) // Show specific backend error
 	}
 
 	return (
-		<div>
-			<h2>Create a New Product</h2>
-			<form onSubmit={createProduct}>
-				<label htmlFor="name">Name:</label>
-				<br />
-				<input
+		<Form onSubmit={createProduct}>
+			<Form.Group className="mb-3" controlId="productName">
+				<Form.Label>Name</Form.Label>
+				<Form.Control
 					type="text"
-					id="name"
-					name="name"
+					placeholder="Enter product name"
 					required
-					onChange={(e) => setName(e.target.value)}
 					value={name}
+					onChange={(e) => setName(e.target.value)}
 				/>
-				<br />
-				<label htmlFor="description">Description:</label>
-				<br />
-				<textarea
-					id="description"
-					name="description"
+			</Form.Group>
+
+			<Form.Group className="mb-3" controlId="productDescription">
+				<Form.Label>Description</Form.Label>
+				<Form.Control
+					as="textarea"
+					rows={3}
+					placeholder="Enter product description"
 					required
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
-				></textarea>
-				<br />
-				<label htmlFor="price">Price:</label>
-				<br />
-				<input
+				/>
+			</Form.Group>
+
+			<Form.Group className="mb-3" controlId="productPrice">
+				<Form.Label>Price</Form.Label>
+				<Form.Control
 					type="number"
-					id="price"
-					name="price"
+					step="0.01"
+					placeholder="0.00"
 					required
 					value={price}
 					onChange={(e) => setPrice(e.target.value)}
 				/>
-				<br />
-				<label htmlFor="quantity">Quantity:</label>
-				<br />
-				<input
+			</Form.Group>
+
+			<Form.Group className="mb-3" controlId="productQuantity">
+				<Form.Label>Quantity</Form.Label>
+				<Form.Control
 					type="number"
-					id="quantity"
-					name="quantity"
+					placeholder="0"
 					required
 					value={quantity}
 					onChange={(e) => setQuantity(e.target.value)}
 				/>
-				<br />
+			</Form.Group>
 
-				<label htmlFor="category">Category:</label>
-				<br />
-				<select
-					id="category"
-					name="category"
+			<Form.Group className="mb-3" controlId="productCategory">
+				<Form.Label>Category</Form.Label>
+				<Form.Select
 					required
 					value={category}
 					onChange={(e) => setCategory(e.target.value)}
@@ -150,12 +151,13 @@ const CreateProduct = () => {
 							{cat.category_name}
 						</option>
 					))}
-				</select>
-				<br />
-				<br />
-				<input type="submit" value="Submit"></input>
-			</form>
-		</div>
+				</Form.Select>
+			</Form.Group>
+
+			<Button variant="primary" type="submit" className="w-100">
+				Create Product
+			</Button>
+		</Form>
 	)
 }
 
